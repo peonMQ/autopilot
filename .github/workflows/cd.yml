@@ -4,11 +4,14 @@ on:
   release:
     types: [published]
 
+env:
+  PROJECT: "autopilot"
+
 jobs:
   release:
     runs-on: windows-latest
     env:
-      BundleFileName: "autopilot.zip"
+      BUNDLE_FILE_NAME: "autopilot.zip"
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -16,16 +19,38 @@ jobs:
         submodules: recursive
 
     - name: Create Bundle  
-      shell: bash
+      shell: pwsh
       run: |
-        # Pack files
-        7z a -tzip $BundleFileName *.lua
-        7z a -tzip $BundleFileName utils/*.lua
+        $excludeDirs = @('.github','.vscode','definitions','utils')
+        $releaseDir = $env:PROJECT + "\"
+        $Directories = Get-ChildItem -Directory "." -Exclude $excludeDirs 
+
+        function CopyReleaseContents($parentDir, $directories){
+
+            foreach($dir in $directories) {
+                $currentDir = ($parentDir + $dir.Name + "\")
+                $childReleaseDir = ($releaseDir + $currentDir)
+                New-Item -Path $childReleaseDir -ItemType Directory
+                Copy ($currentDir + "*.lua") $childReleaseDir 
+
+
+                $ChildDirectories = Get-ChildItem -Directory $dir.Name 
+                CopyReleaseContents ($currentDir+"\") $ChildDirectories
+
+            }
+        }
+
+        New-Item -Path $releaseDir -ItemType Directory
+        Copy "*.lua" $releaseDir
+        CopyReleaseContents '.\' $Directories
+
+        7z a -tzip $env:BUNDLE_FILE_NAME -r ($env:PROJECT + "/*.lua")
+        7z a -tzip $env:BUNDLE_FILE_NAME utils/*.lua
 
     - name: Publish
       uses: softprops/action-gh-release@v1
       with:
-        files: "*.zip"
+        files: autopilot.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
