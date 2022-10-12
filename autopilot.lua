@@ -7,7 +7,7 @@ local args = {...}
 
 ---@type table<string, table<string, string[]>>
 local navmapType = nil
-local navmap = configLoader.LoadConfig('', navmapType, "data/autopilot.json")
+local navmap = configLoader('', navmapType, "data/autopilot.json")
 
 ---@param waypoints string[]
 local function navigateZoneWayPoints(waypoints)
