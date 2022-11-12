@@ -1,13 +1,18 @@
 --- @type Mq
 local mq = require('mq')
 local logger = require('utils/logging')
-local configLoader = require('utils/configloader')
+local debugUtil = require('utils/debug')
+local json = require('utils/json')
 
 local args = {...}
 
+local configDir = mq.configDir.."/"
+local serverName = mq.TLO.MacroQuest.Server()
+
 ---@type table<string, table<string, string[]>>
-local navmapType = nil
-local navmap = configLoader('', navmapType, "data/autopilot.json")
+local navmap = json.LoadJSON(configDir..serverName.."/data/autopilot.json")
+
+debugUtil.PrintTable(navmap)
 
 ---@param waypoints string[]
 local function navigateZoneWayPoints(waypoints)
