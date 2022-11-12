@@ -12,8 +12,6 @@ local serverName = mq.TLO.MacroQuest.Server()
 ---@type table<string, table<string, string[]>>
 local navmap = json.LoadJSON(configDir..serverName.."/data/autopilot.json")
 
-debugUtil.PrintTable(navmap)
-
 ---@param waypoints string[]
 local function navigateZoneWayPoints(waypoints)
   for i=1,#waypoints do
@@ -39,7 +37,7 @@ local function engangeAutopilot(destination)
   end
 
   local destinationNavMap = navmap[destination]
-  if not destination then
+  if not destinationNavMap then
     logger.Warn("Route <%s> has no entry in the navmap. Unable to find a route, exiting.", destination)
     return
   end
