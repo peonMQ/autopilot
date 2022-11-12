@@ -14,6 +14,10 @@ local navmap = json.LoadJSON(configDir..serverName.."/data/autopilot.json")
 
 ---@param waypoints string[]
 local function navigateZoneWayPoints(waypoints)
+  if not waypoints then
+    return
+  end
+
   for i=1,#waypoints do
     local waypoint = waypoints[i]
     if mq.TLO.Navigation.PathExists("wp "..waypoint) then
